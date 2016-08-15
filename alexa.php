@@ -13,12 +13,40 @@ function alexa_rank($url){
 	if (! $xml->SD)
 		return false;
 
-	return array("popularity" => $xml->SD->POPULARITY->attributes()->TEXT->__toString(),
-				 "reach" => $xml->SD->REACH->attributes()->RANK->__toString(),
-				 "rank_delta" => $xml->SD->RANK->attributes()->DELTA->__toString(),
-				 "country_name" => $xml->SD->COUNTRY->attributes()->NAME->__toString(),
-				 "country_code" => $xml->SD->COUNTRY->attributes()->CODE->__toString(),
-				 "country_rank" => $xml->SD->COUNTRY->attributes()->RANK->__toString());
+	$errors = array();
+
+	$popularity = get_class($xml->SD->POPULARITY->attributes()->TEXT) !== false ? $xml->SD->POPULARITY->attributes()->TEXT->__toString() : null;
+	if ($popularity === null)
+		$errors[] = "No popularity rating";
+	
+	$reach = get_class($xml->SD->REACH->attributes()->RANK) !== false ? $xml->SD->REACH->attributes()->RANK->__toString() : null;
+	if ($reach === null)
+		$errors[] = "No reach data";
+	
+	$rankdelta = get_class($xml->SD->RANK->attributes()->DELTA) !== false ? $xml->SD->RANK->attributes()->DELTA->__toString() : null;
+	if ($rankdelta === null)
+		$errors[] = "No rank delta info";
+	
+	$country_name = get_class($xml->SD->COUNTRY->attributes()->NAME) !== false ? $xml->SD->COUNTRY->attributes()->NAME->__toString() : null;
+	if ($country_name === null)
+		$errors[] = "No specific country name data";
+	
+	$country_code = get_class($xml->SD->COUNTRY->attributes()->CODE) !== false ? $xml->SD->COUNTRY->attributes()->CODE->__toString() : null;
+	if ($country_code === null)
+		$errors[] = "No specific country code data";
+	
+	$country_rank = get_class($xml->SD->COUNTRY->attributes()->RANK) !== false ? $xml->SD->COUNTRY->attributes()->RANK->__toString() : null;
+	if ($country_rank === null)
+		$errors[] = "No specific country rank data";
+	
+
+	return array("popularity" => $popularity,
+				 "reach" => $reach,
+				 "rank_delta" => $rankdelta,
+				 "country_name" => $country_name,
+				 "country_code" => $country_code,
+				 "country_rank" => $country_rank,
+				 "errors" => $errors);
 }
 $retArr = array();
 $retArr["requested-from"] = $_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'];
