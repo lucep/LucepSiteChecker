@@ -1,6 +1,8 @@
 # LucepSiteChecker
 A few quick scripts to enable site assessment using publicly available APIs
 
+This has been implemented for general public use up at: https://lucep.com/compare-me
+
 ### Currently supported _(working as of 15 Sep 2016)_
 - Google PageSpeed
 - Alexa Page Rank
