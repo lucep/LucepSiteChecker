@@ -257,18 +257,18 @@
 	};
 
 	sitePerformanceChecker["get_alexa_details"] = function(callback){
-		promise.post(sitePerformanceChecker.alexa_endpoint, {url: sitePerformanceChecker.site})
+		promise.post(sitePerformanceChecker.alexa_endpoint, {"url": sitePerformanceChecker.site})
 			.then(function (err, response, xhr){
 				if (err){
 					console.log("Error: "+xhr.status);
 					console.log("Unable to retrieve Alexa details");
 					if (typeof callback=="function")
-						callback({status: false, error: true});
+						callback({"status": false, "error": true});
 				}else{
 					var ax = JSON.parse(response);
 					sitePerformanceChecker["alexa"] = ax;
 					if (typeof callback=="function")
-						callback({status: ax["status"], data: ax["alexa"]});
+						callback({"status": ax["status"], "data": ax["alexa"]});
 				}
 			});
 		return true;
@@ -276,21 +276,21 @@
 
 	sitePerformanceChecker["get_google_analysis_desktop"] = function(callback){
 		promise.get("https://www.googleapis.com/pagespeedonline/v2/runPagespeed", 
-					{url: sitePerformanceChecker.site,
-					 screenshot: "true",
-					 strategy: "desktop",
-					 key: sitePerformanceChecker.google_apikey})
+					{"url": sitePerformanceChecker.site,
+					 "screenshot": "true",
+					 "strategy": "desktop",
+					 "key": sitePerformanceChecker.google_apikey})
 			.then(function (err, response, xhr){
 				if (err){
 					console.log("Error:"+xhr.status);
 					console.log("Unable to retrieve Google Insights");
 					if (typeof callback=="function")
-						callback({status:false, error: true});
+						callback({"status":false, "error": true});
 				}else{
 					var goog = JSON.parse(response);
 					sitePerformanceChecker["google"] = goog;
 					if (typeof callback=="function")
-						callback({status: true, google: goog});
+						callback({"status": true, "google": goog});
 				}
 			});
 					 
@@ -298,26 +298,25 @@
 
 	sitePerformanceChecker["get_google_analysis_mobile"] = function(callback){
 		promise.get("https://www.googleapis.com/pagespeedonline/v2/runPagespeed", 
-					{url: sitePerformanceChecker.site,
-					 screenshot: "true",
-					 strategy: "mobile",
-					 key: sitePerformanceChecker.google_apikey})
+					{"url": sitePerformanceChecker.site,
+					 "screenshot": "true",
+					 "strategy": "mobile",
+					 "key": sitePerformanceChecker.google_apikey})
 			.then(function (err, response, xhr){
 				if (err){
 					console.log("Error:"+xhr.status);
 					console.log("Unable to retrieve Google Insights");
 					if (typeof callback=="function")
-						callback({status:false, error: true});
+						callback({"status":false, "error": true});
 				}else{
 					var goog = JSON.parse(response);
 					sitePerformanceChecker["google"] = goog;
 					if (typeof callback=="function")
-						callback({status: true, google: goog});
+						callback({"status": true, "google": goog});
 				}
 			});
 					 
 	};
-
 
 	exports["$lucepsitechecker"] = sitePerformanceChecker;
 
