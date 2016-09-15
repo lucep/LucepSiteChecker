@@ -248,27 +248,31 @@
 	sitePerformanceChecker["load_google_apikey"] = function(apikey){
 		sitePerformanceChecker.google_apikey = apikey;
 	};
-	sitePerformanceChecker["load_alexa_query_endpoint"] = function (endpoint_addr){
-		sitePerformanceChecker.alexa_endpoint = endpoint_addr;
+	sitePerformanceChecker["load_reach_and_social_endpoint"] = function (endpoint_addr){
+		sitePerformanceChecker.rns_endpoint = endpoint_addr;
 	};
 
 	sitePerformanceChecker["set_site"] = function(site_address){
 		sitePerformanceChecker.site = site_address;
 	};
-
-	sitePerformanceChecker["get_alexa_details"] = function(callback){
-		promise.post(sitePerformanceChecker.alexa_endpoint, {"url": sitePerformanceChecker.site})
+	sitePerformanceChecker["get_reach_and_social_data"] = function(callback){
+		promise.post(sitePerformanceChecker.rns_endpoint, {"url": sitePerformanceChecker.site})
 			.then(function (err, response, xhr){
 				if (err){
 					console.log("Error: "+xhr.status);
-					console.log("Unable to retrieve Alexa details");
+					console.log("Unable to retrieve reach and social details");
 					if (typeof callback=="function")
 						callback({"status": false, "error": true});
 				}else{
-					var ax = JSON.parse(response);
-					sitePerformanceChecker["alexa"] = ax;
+					var rns = JSON.parse(response);
+					sitePerformanceChecker["alexa"] = rns["alexa"];
+					sitePerformanceChecker["linkedin"] = rns["linkedin"];
+					sitePerformanceChecker["stumbleupon"] = rns["stumbleupon"]
 					if (typeof callback=="function")
-						callback({"status": ax["status"], "data": ax["alexa"]});
+						callback({"status": rns["status"], 
+								  "alexa": rns["alexa"],
+								  "linkedin": rns["linkedin"],
+								  "stumbleupon":rns["stumbleupon"]});
 				}
 			});
 		return true;
@@ -317,6 +321,46 @@
 			});
 					 
 	};
+
+	sitePerformanceChecker["get_facebook_info"] = function(callback){
+		promise.get("https://graph.facebook.com/"+sitePerformanceChecker.site,
+					{})
+		.then(function (err, response, xhr){
+			if (err){
+				console.log("Error: ".xhr.status);
+				console.log("Unable to retrieve Facebook data");
+				if (typeof callback=="function")
+					callback({"status": false, "error": true});
+			}else{
+				var fb = JSON.parse(response);
+				sitePerformanceChecker["facebook"] = fb;
+				if (typeof callback=="function")
+					callback({"status":true, "facebook":fb});
+			}
+		});
+					
+	}
+
+	sitePerformanceChecker["get_pinterest_info"] = function(callback){
+		promise.get("https://widgets.pinterest.com/v1/urls/count.json",
+					{"url": sitePerformanceChecker.site,
+					"source": 6})
+		.then(function (err, response, xhr){
+			if (err){
+				console.log("Error: ".xhr.status);
+				console.log("Unable to retrieve Pinterest data");
+				if (typeof callback=="function")
+					callback({"status": false, "error": true});
+			}else{
+				//strip the "receiveCount" wrapper from around the JSON
+				var pin = JSON.parse(response.substr(13, response.indexOf("})", 13)-12));
+				sitePerformanceChecker["pinterest"] = pin;
+				if (typeof callback=="function")
+					callback({"status":true, "pinterest":pin});
+			}
+		});
+	}
+
 
 	exports["$lucepsitechecker"] = sitePerformanceChecker;
 

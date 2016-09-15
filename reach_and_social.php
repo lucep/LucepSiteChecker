@@ -48,21 +48,47 @@ function alexa_rank($url){
 				 "country_rank" => $country_rank,
 				 "errors" => $errors);
 }
+
+function linked_in_data($url){
+	$data = file_get_contents("https://www.linkedin.com/countserv/count/share?url=".urlencode($url)."&format=json");
+	return json_decode($data);
+}
+
+function stumble_data($url){
+	$data = file_get_contents("https://www.stumbleupon.com/services/1.01/badge.getinfo?url=".urlencode($url));
+	return json_decode($data);
+}
+
 $retArr = array();
 $retArr["requested-from"] = $_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'];
 $url = $_POST["url"];
 
+$url = "http://www.lucep.com";
+
+$retArr["status"] = true;
+$retArr["error"] = false;
+$retArr["url"] = $parsed_url["scheme"]."://".$parsed_url["host"];
+
 $parsed_url = parse_url($url);
 try{
 	if ($url && $parsed_url["host"]){
-		$res = alexa_rank($parsed_url["scheme"]."://".$parsed_url["host"]);
-		if (!$res)
-			throw new Exception ("No Alexa data found for this website");
+		$alexa = alexa_rank($parsed_url["scheme"]."://".$parsed_url["host"]);
+		if (!$alexa)
+			$retArr["alexa"] = array("errors"=>"no data returned");
+		else
+			$retArr["alexa"] = $alexa;
 
-		$retArr["status"] = true;
-		$retArr["error"] = false;
-		$retArr["url"] = $parsed_url["scheme"]."://".$parsed_url["host"];
-		$retArr["alexa"] = $res;
+		$linkedin = linked_in_data($parsed_url["scheme"]."://".$parsed_url["host"]);
+		if (!$linkedin)
+			$retArr["linkedin"] = array("errors"=>"no data returned");
+		else
+			$retArr["linkedin"] = $linkedin;
+
+		$stumble = stumble_data($parsed_url["scheme"]."://".$parsed_url["host"]);
+		if (!$stumble)
+			$retArr["stumbleupon"] = array("errors"=>"no data returned");
+		else
+			$retArr["stumbleupon"] = $stumble;
 
 	}else{
 		throw new Exception ("No URL provided");
